@@ -35,8 +35,16 @@ public class UI {
         frame.setVisible(true);
     }
 
-    private List<POSResult> searchText(String text, SearchType type, String needle) {
-       return search(text, type, needle);
+    /**
+     *
+     * @param text
+     * @param type
+     * @param needle
+     * @param surroundingWords Number of words desired before & after the found result.
+     * @return
+     */
+    private List<POSResult> searchText(String text, SearchType type, String needle, Integer surroundingWords) {
+       return search(text, type, needle, surroundingWords);
     }
 
     private String getTxtFromURL(String url) {
