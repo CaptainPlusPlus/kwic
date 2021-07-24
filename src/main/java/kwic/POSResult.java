@@ -36,4 +36,5 @@ public class POSResult {
     public String getPos() {
         return pos;
     }
+
 }
