@@ -44,6 +44,10 @@ public class UI {
 
         // Set window size
         frame.setSize(1000, 800);
+        frame.getContentPane().setBackground(new Color(198, 175, 223));
+
+        Color thistle = new Color(221,190,224);
+        Color piggyPink = new Color(240,221,236);
 
         //Override JFrames default layout manager.
         //Text field to edit selection
@@ -66,22 +70,12 @@ public class UI {
 
         //Panel-----------------------------------------------------
 
-        JPanel panel = new JPanel();
-
-        aTextField0 = new JTextField(60);
-        aTextField0.setMaximumSize(new Dimension(200, 30));
-        aTextField0.setText("Enter the URL");
-
-
-        //Override JFrames default layout manager.
-        BoxLayout aBoxLayout0 = new BoxLayout(panel, BoxLayout.X_AXIS);
-        panel.setLayout(aBoxLayout0);
-
-        panel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-
 
 //Panel0-----------------------------------------------------
         JPanel panel0 = new JPanel();
+
+        panel0.setBackground(new Color(221, 190, 224));
+
 
         aTextField0 = new JTextField(200);
         aTextField0.setMaximumSize(new Dimension(200, 30));
@@ -89,7 +83,7 @@ public class UI {
 
         JButton searchButton = new JButton("Search");
         searchButton.setMaximumSize(size);
-        searchButton.setBackground(new Color(255, 102, 102));
+        searchButton.setBackground(new Color(190,126,163));
         searchButton.addActionListener(new SearchButtonHandler());
 
         makeChoice.setMaximumSize(new Dimension(200, 30));
@@ -109,19 +103,20 @@ public class UI {
         panel0.add(searchButton);
         panel0.add(Box.createRigidArea(new Dimension(10, 0)));
         panel0.add(makeChoice);
+        panel0.setBackground(new Color(198, 175, 223));
 
 
         //Panel1-----------------------------------------------------
 
-        String readIn = "    ";
-
-        textArea.setText(readIn);
+        textArea.setText("\t\t ----- Sentence ----- \t\t\n");
         textArea.setSize(new Dimension(200, 300));
+        textArea.setBackground(piggyPink);
         JScrollPane textAreasp = new JScrollPane(textArea);
-        textAreasp.setSize(new Dimension(200, 300));
+        textAreasp.setSize(new Dimension(100, 300));
         //String summary = "Categories: \n" + "Noun(%) \n" + "Verb(%)\n" + " \n" + "Position within a sentence:\n" + "Beginning(%)\n" + "Middle(%)\n" + "End(%)\n";
-        listPane2 = new JTextArea("");
-        listPane2.setMinimumSize(new Dimension(300, 300));
+        listPane2 = new JTextArea("\t \t  ----- Result ----- \t \t\n");
+        listPane2.setBackground(piggyPink);
+        //listPane2.setMinimumSize(new Dimension(100, 200));
 
         JPanel panel4 = new JPanel();
 
@@ -129,6 +124,8 @@ public class UI {
         //Override JFrames default layout manager.
         BoxLayout aBoxLayout = new BoxLayout(panel4, BoxLayout.X_AXIS);
         panel4.setLayout(aBoxLayout);
+        panel4.setBackground(new Color(198, 175, 223));
+
 
 
         //Add 5 Pixels rigid space between components
@@ -140,46 +137,42 @@ public class UI {
         panel4.add(Box.createRigidArea(new Dimension(20, 20)));
 
 
-        //This is the common size of the buttons
-
-
-        JButton rmButton = new JButton("Remove");
-        rmButton.setMaximumSize(size);
-        rmButton.addActionListener(new RMButtonHandler());
-
-
         //add save button and link it with SaveButtonHandler
         JButton save = new JButton("Save");
         save.setMaximumSize(size);
         save.addActionListener(new SaveButtonHandler());
+        save.setBackground(new Color(190,126,163));
         frame.getContentPane().add(save);
 
 
-        JButton quitButton = new JButton("Quit");
-        quitButton.setMaximumSize(size);
-        quitButton.addActionListener(new QuitButtonHandler());
+        JButton clearButton = new JButton("Clear");
+        clearButton.setMaximumSize(size);
+        clearButton.setBackground(new Color(190,126,163));
+        clearButton.addActionListener(new ClearButtonHandler());
 
 
         //Panel2-----------------------------------------------------
         JPanel panel5 = new JPanel();
-        panel5.add(Box.createRigidArea(new Dimension(200, 0)));
         panel5.add(save);
-        panel5.add(Box.createRigidArea(new Dimension(0, 5)));
-        panel5.add(quitButton);
+        panel5.add(Box.createRigidArea(new Dimension(50, 5)));
+        panel5.add(clearButton);
         panel5.add(Box.createVerticalGlue());
         panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
-        panel5.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        panel5.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel5.setBackground(new Color(198, 175, 223));
+
+
+
 
 
         frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
-        frame.getContentPane().add(Box.createRigidArea(new Dimension(5, 10)));
-        frame.getContentPane().add(panel);
-        frame.getContentPane().add(Box.createRigidArea(new Dimension(5, 0)));
+        frame.getContentPane().add(Box.createRigidArea(new Dimension(5, 20)));
         frame.getContentPane().add(panel0);
-        frame.getContentPane().add(Box.createRigidArea(new Dimension(5, 0)));
+        frame.getContentPane().add(Box.createRigidArea(new Dimension(5, 20)));
         frame.getContentPane().add(panel4);
-        frame.getContentPane().add(Box.createRigidArea(new Dimension(5, 0)));
+        frame.getContentPane().add(Box.createRigidArea(new Dimension(5, 20)));
         frame.getContentPane().add(panel5);
+        frame.getContentPane().add(Box.createRigidArea(new Dimension(5, 20)));
 
         frame.addWindowListener(new MyWindowListener());
 
@@ -240,6 +233,10 @@ public class UI {
             String text = "the door is right there";
             List<POSResult> results = searchText(text, type, needle, surroundingWords);
 
+            if(results.size() ==0){
+                JOptionPane.showMessageDialog(frame, "word not found");
+            }
+
 
             for (POSResult a : results) {
                 String sentence = "";
@@ -255,24 +252,9 @@ public class UI {
         }
     }
 
-    private class RMButtonHandler implements ActionListener {
-
-        public void actionPerformed(ActionEvent e) {
-            int elementIndex = aList.getSelectedIndex();
-            if (elementIndex != -1) {
-                if (JOptionPane.showConfirmDialog(frame, "Really delete element??")
-                        == JOptionPane.YES_OPTION) {
-                    DefaultListModel<String> aListModel = (DefaultListModel<String>) aList.getModel();
-                    aListModel.remove(elementIndex);
-                }
-            }
-        }
-    }
-
 
     private class SaveButtonHandler implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-
 
             String urlAddress = aTextField0.getText();
             String needle = aTextField.getText();
@@ -283,7 +265,6 @@ public class UI {
             switch (makeChoice.getSelectedItem().toString()) {
                 case "Extact form":
                     type = ExactForm;
-                    ;
                     break;
                 case "Lemma":
                     type = Lemma;
@@ -305,22 +286,24 @@ public class UI {
             String text = getTxtFromURL(urlAddress);
             List<POSResult> results = searchText(text, type, needle, surroundingWords);
 
-
             try {
                 save(urlAddress, needle, type, results);
             } catch (NullPointerException en) {// if the window is closed and point null, catch error
                 JOptionPane.showMessageDialog(frame, "Saved");
             }
 
-
         }
     }
 
 
-    private class QuitButtonHandler implements ActionListener {
-
+    private class ClearButtonHandler implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            System.exit(0);
+            aTextField.setText("Enter a word");
+            aTextField1.setText("Enter the number of surrounding words");
+            aTextField0.setText("Enter the URL");
+            textArea.setText("\t\t ----- Sentence ----- \t\t\n");
+            listPane2.setText("\t \t  ----- Result ----- \t \t\n");
+            makeChoice.setSelectedIndex(0);
         }
     }
 
