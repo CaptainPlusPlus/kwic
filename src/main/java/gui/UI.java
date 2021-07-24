@@ -40,11 +40,12 @@ public class UI {
      * @param text
      * @param type
      * @param needle
-     * @param surroundingWords Number of words desired before & after the found result.
+     * @param preWords Number of words desired before found result.
+     * @param postWords Number of words desired before found result.
      * @return
      */
-    private List<POSResult> searchText(String text, SearchType type, String needle, Integer surroundingWords) {
-       return search(text, type, needle, surroundingWords);
+    private List<POSResult> searchText(String text, SearchType type, String needle, Integer preWords, Integer postWords) {
+       return search(text, type, needle, preWords, postWords);
     }
 
     private String getTxtFromURL(String url) {
