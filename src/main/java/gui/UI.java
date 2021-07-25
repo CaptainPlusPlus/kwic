@@ -8,6 +8,10 @@ import kwic.SearchType;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,6 +21,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -30,6 +35,8 @@ public class UI {
     private JTextField aTextField;
     private JTextField aTextField0;
     private JTextField aTextField1;
+    protected JTextComponent comp;
+    protected Highlighter.HighlightPainter painter;
     JTextArea listPane2;
     private JTextArea textArea = new JTextArea();
     JList<String> aList; // list component
@@ -46,8 +53,9 @@ public class UI {
         frame.setSize(1000, 800);
         frame.getContentPane().setBackground(new Color(198, 175, 223));
 
-        Color thistle = new Color(221,190,224);
-        Color piggyPink = new Color(240,221,236);
+        Color thistle = new Color(221, 190, 224);
+        Color piggyPink = new Color(240, 221, 236);
+        Color pastelYellow = new Color(253, 253, 150);
 
         //Override JFrames default layout manager.
         //Text field to edit selection
@@ -83,7 +91,7 @@ public class UI {
 
         JButton searchButton = new JButton("Search");
         searchButton.setMaximumSize(size);
-        searchButton.setBackground(new Color(190,126,163));
+        searchButton.setBackground(pastelYellow);
         searchButton.addActionListener(new SearchButtonHandler());
 
         makeChoice.setMaximumSize(new Dimension(200, 30));
@@ -127,7 +135,6 @@ public class UI {
         panel4.setBackground(new Color(198, 175, 223));
 
 
-
         //Add 5 Pixels rigid space between components
 
         panel4.add(Box.createRigidArea(new Dimension(20, 20)));
@@ -139,15 +146,15 @@ public class UI {
 
         //add save button and link it with SaveButtonHandler
         JButton save = new JButton("Save");
-        save.setMaximumSize(size);
+        save.setSize(200, 50);
         save.addActionListener(new SaveButtonHandler());
-        save.setBackground(new Color(190,126,163));
+        save.setBackground(pastelYellow);
         frame.getContentPane().add(save);
 
 
         JButton clearButton = new JButton("Clear");
-        clearButton.setMaximumSize(size);
-        clearButton.setBackground(new Color(190,126,163));
+        clearButton.setSize(200, 50);
+        clearButton.setBackground(pastelYellow);
         clearButton.addActionListener(new ClearButtonHandler());
 
 
@@ -160,9 +167,6 @@ public class UI {
         panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
         panel5.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel5.setBackground(new Color(198, 175, 223));
-
-
-
 
 
         frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
@@ -207,13 +211,13 @@ public class UI {
     private class SearchButtonHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-//Hightlight
-
             // shows result
 
             String urlAddress = aTextField0.getText();
             String needle = aTextField.getText();
             Integer surroundingWords = Integer.valueOf(aTextField1.getText());
+            textArea.setText("\t\t ----- Sentence ----- \t\t\n");
+            listPane2.setText("\t \t  ----- Result ----- \t \t\n");
 
             SearchType type = null;
             //"Exact form", "Lemma", "Entering tag"};
@@ -230,25 +234,58 @@ public class UI {
             }
 
             //String text = getTxtFromURL(urlAddress);
-            String text = "the door is right there";
+            String text = "“We’re spending the night here. I’ve already let my parents know not to expect us back. You don’t have to worry about Chris.”\n" +
+                    "\n" +
+                    "Oh! The arrogance of his assumption doesn’t annoy me – instead it serves as proof of his thoughtfulness though, I worry about leaving with one man and coming home with another. I push the thought away, eager to indulge in a bit of Mr Grey.\n" +
+                    "\n" +
+                    "“Thank you.” I fling my arms around his neck, beyond ecstatic and smile at him, cramming every bit of joy I feel into it. This suite that I could hardly bear to enter into an hour ago has now become the perfect place for our reunion.";
             List<POSResult> results = searchText(text, type, needle, surroundingWords);
 
-            if(results.size() ==0){
+            // Highlighter highlighter = comp.getHighlighter();
+            // Highlighter.Highlight[] highlights = highlighter.getHighlights();
+
+
+            if (results.size() == 0) {
                 JOptionPane.showMessageDialog(frame, "word not found");
             }
 
+            if (results.isEmpty()) {
+                textArea.append("  (0 result)\n");
+                listPane2.append("  (0 result)\n");
+            } else {
+                for (POSResult a : results) {
+                    String sentence = "";
+                    for (String token : a.getSentence()) {
+                        sentence += token + " ";
 
-            for (POSResult a : results) {
-                String sentence = "";
-                for (String token : a.getSentence()) {
-                    sentence += token + " ";
+                    }
+                    textArea.append("  " + sentence + "\n");
+                    try {
+                        List<Integer> indexes = new ArrayList<>();
+                        int index = 0;
+                        while (index != -1) {
+                            index = textArea.getText().indexOf(needle, index);
+                            if (index != -1) {
+                                indexes.add(index);
+                                index++;
+                            }
+                        }
+
+                        for (int i : indexes) {
+                            textArea.getHighlighter().addHighlight(i, i + needle.length(), new DefaultHighlighter.DefaultHighlightPainter(Color.yellow));
+                        }
+
+                        System.out.println(textArea.getText().indexOf(needle));
+                        System.out.println(textArea.getText().indexOf(needle) + 3);
+                    } catch (BadLocationException badLocationException) {
+                        badLocationException.printStackTrace();
+                    }
+                    listPane2.append("  " + "Word: " + a.getWord() + ", Lemma: " + a.getLemma() + ", POSTag: " + a.getPos() + "\n");
+
                 }
-                textArea.append(sentence + "\n");
 
-                listPane2.append("Word: " + a.getWord() + ", Lemma: " + a.getLemma() +", POSTag: " +a.getPos() + "\n") ;
 
             }
-
         }
     }
 
