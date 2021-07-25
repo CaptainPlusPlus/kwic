@@ -13,17 +13,10 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Locale;
 
 import static kwic.SearchType.*;
 import static kwic.Searcher.search;
@@ -32,40 +25,44 @@ import static scraper.URLScraper.scrape;
 public class UI {
     private JFrame frame; // Our top level window
     private String corpus;
-    private JTextField aTextField;
-    private JTextField aTextField0;
-    private JTextField aTextField1;
+    private JTextField wordField;
+    private JTextField urlField;
+    private JTextField surroundNfield;
     protected JTextComponent comp;
     protected Highlighter.HighlightPainter painter;
-    JTextArea listPane2;
-    private JTextArea textArea = new JTextArea();
-    JList<String> aList; // list component
+    JTextArea resultField;
+    JTextArea urlText;
+    JTextArea wordText;
+    JTextArea surroundingNText;
+
+    private JTextArea sentenceField = new JTextArea();
     String s1[] = {"Make your choice:", "Exact form", "Lemma", "Entering tag"};
-    private JComboBox makeChoice = new JComboBox(s1);
+    private JComboBox makeChoice;
 
     /**
      * Constructor for UI window
      */
     UI() {
+
+        // Color
+        Color inputC = new Color(237, 232, 234); //lightGray
+        Color outputC = new Color(239, 239, 239); //brightGray
+        Color buttonC = new Color(243, 240, 224); //alabaster
+        Color backgroundC = new Color(228, 234, 222); //chineseWhite
+
+        //Font
+        Font fieldFont = new Font("Courier", Font.PLAIN, 15);
+        Font contentFont = new Font("Courier", Font.PLAIN, 20);
+        Font buttonFont = new Font("Courier", Font.BOLD, 20);
+
         frame = new JFrame("Kwic UI");
+        frame.setSize(1400, 800);
+        frame.getContentPane().setBackground(backgroundC);
 
-        // Set window size
-        frame.setSize(1000, 800);
-        frame.getContentPane().setBackground(new Color(198, 175, 223));
-
-        Color thistle = new Color(221, 190, 224);
-        Color piggyPink = new Color(240, 221, 236);
-        Color pastelYellow = new Color(253, 253, 150);
 
         //Override JFrames default layout manager.
         //Text field to edit selection
-        aTextField = new JTextField(60);
-        aTextField.setMaximumSize(new Dimension(200, 30));
-        aTextField.setText("Enter a word");
 
-        aTextField1 = new JTextField(60);
-        aTextField1.setMaximumSize(new Dimension(200, 30));
-        aTextField1.setText("Enter the number of surrounding words");
         /* Create a fixed size for the text field. Otherwise the text field
          * will stretch when the window is resized
          */
@@ -76,110 +73,165 @@ public class UI {
         //Connect List and SelectionListener
         Dimension size = new Dimension(150, 30);
 
-        //Panel-----------------------------------------------------
+        //Panel1-----------------------------------------------------
 
+        JPanel panel1 = new JPanel();
 
-//Panel0-----------------------------------------------------
-        JPanel panel0 = new JPanel();
+        panel1.setBackground(buttonC);
 
-        panel0.setBackground(new Color(221, 190, 224));
+        urlText = new JTextArea("URL : ");
+        urlText.setMaximumSize(new Dimension(200, 30));
+        urlText.setBackground(backgroundC);
+        urlText.setEditable(false);
+        urlText.setFont(contentFont);
 
+        urlField = new JTextField(20);
+        urlField.setMaximumSize(new Dimension(400, 30));
+        urlField.setText("Enter the URL");
+        urlField.setFont(fieldFont);
+        urlField.setBackground(inputC);
+        urlField.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e){
+                urlField.setText("");
+            }
+        });
 
-        aTextField0 = new JTextField(200);
-        aTextField0.setMaximumSize(new Dimension(200, 30));
-        aTextField0.setText("Enter the URL");
+        wordText = new JTextArea("Word : ");
+        wordText.setMaximumSize(new Dimension(100, 30));
+        wordText.setBackground(backgroundC);
+        wordText.setEditable(false);
+        wordText.setFont(contentFont);
+
+        wordField = new JTextField(10);
+        wordField.setMaximumSize(new Dimension(400, 30));
+        wordField.setText("Enter a word");
+        wordField.setFont(fieldFont);
+        wordField.setBackground(inputC);
+        wordField.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e){
+                wordField.setText("");
+            }
+        });
+
+        surroundingNText = new JTextArea("Surrounding words : ");
+        surroundingNText.setMaximumSize(new Dimension(100, 30));
+        surroundingNText.setBackground(backgroundC);
+        surroundingNText.setEditable(false);
+        surroundingNText.setFont(contentFont);
+
+        surroundNfield = new JTextField(25);
+        surroundNfield.setMaximumSize(new Dimension(200, 30));
+        surroundNfield.setText("Enter the number of surrounding words");
+        surroundNfield.setFont(fieldFont);
+        surroundNfield.setBackground(inputC);
+        surroundNfield.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e){
+                surroundNfield.setText("");
+            }
+        });
 
         JButton searchButton = new JButton("Search");
         searchButton.setMaximumSize(size);
-        searchButton.setBackground(pastelYellow);
+        searchButton.setBackground(buttonC);
         searchButton.addActionListener(new SearchButtonHandler());
+        searchButton.setFont(buttonFont);
 
+        makeChoice = new JComboBox(s1);
         makeChoice.setMaximumSize(new Dimension(200, 30));
+        makeChoice.setFont(fieldFont);
+        makeChoice.setBackground(inputC);
 
 
         //Override JFrames default layout manager.
-        BoxLayout aBoxLayout1 = new BoxLayout(panel0, BoxLayout.X_AXIS);
-        panel0.setLayout(aBoxLayout1);
-        panel0.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        panel0.add(Box.createRigidArea(new Dimension(10, 0)));
-        panel0.add(aTextField0);
-        panel0.add(Box.createRigidArea(new Dimension(10, 0)));
-        panel0.add(aTextField);
-        panel0.add(Box.createRigidArea(new Dimension(10, 0)));
-        panel0.add(aTextField1);
-        panel0.add(Box.createRigidArea(new Dimension(10, 0)));
-        panel0.add(searchButton);
-        panel0.add(Box.createRigidArea(new Dimension(10, 0)));
-        panel0.add(makeChoice);
-        panel0.setBackground(new Color(198, 175, 223));
+        BoxLayout aBoxLayout1 = new BoxLayout(panel1, BoxLayout.X_AXIS);
+        panel1.setLayout(aBoxLayout1);
+        panel1.add(Box.createRigidArea(new Dimension(20, 0)));
+        panel1.add(urlText);
+        panel1.add(urlField);
+        panel1.add(Box.createRigidArea(new Dimension(10, 0)));
+        panel1.add(wordText);
+        panel1.add(wordField);
+        panel1.add(Box.createRigidArea(new Dimension(10, 0)));
+        panel1.add(surroundingNText);
+        panel1.add(surroundNfield);
+        panel1.add(Box.createRigidArea(new Dimension(10, 0)));
+        panel1.add(searchButton);
+        panel1.add(Box.createRigidArea(new Dimension(10, 0)));
+        panel1.add(makeChoice);
+        panel1.add(Box.createRigidArea(new Dimension(20, 0)));
+        panel1.setBackground(backgroundC);
+        panel1.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 
-        //Panel1-----------------------------------------------------
+        //Panel2-----------------------------------------------------
 
-        textArea.setText("\t\t ----- Sentence ----- \t\t\n");
-        textArea.setSize(new Dimension(200, 300));
-        textArea.setBackground(piggyPink);
-        JScrollPane textAreasp = new JScrollPane(textArea);
-        textAreasp.setSize(new Dimension(100, 300));
-        //String summary = "Categories: \n" + "Noun(%) \n" + "Verb(%)\n" + " \n" + "Position within a sentence:\n" + "Beginning(%)\n" + "Middle(%)\n" + "End(%)\n";
-        listPane2 = new JTextArea("\t \t  ----- Result ----- \t \t\n");
-        listPane2.setBackground(piggyPink);
-        //listPane2.setMinimumSize(new Dimension(100, 200));
+        sentenceField.setText("\t\t ----- Sentence ----- \t\t\n");
+        sentenceField.setBackground(outputC);
+        sentenceField.setEditable(false);
+        sentenceField.setFont(contentFont);
+        sentenceField.setMaximumSize(new Dimension(500, 300));
 
-        JPanel panel4 = new JPanel();
+        JScrollPane textAreasp = new JScrollPane(sentenceField);
+        textAreasp.setSize(new Dimension(500, 300));
+        resultField = new JTextArea("\t \t  ----- Result ----- \t \t\n");
+        resultField.setBackground(outputC);
+        resultField.setEditable(false);
+        resultField.setFont(contentFont);
 
+        JPanel panel2 = new JPanel();
 
         //Override JFrames default layout manager.
-        BoxLayout aBoxLayout = new BoxLayout(panel4, BoxLayout.X_AXIS);
-        panel4.setLayout(aBoxLayout);
-        panel4.setBackground(new Color(198, 175, 223));
+        BoxLayout aBoxLayout = new BoxLayout(panel2, BoxLayout.X_AXIS);
+        panel2.setLayout(aBoxLayout);
+        panel2.setBackground(backgroundC);
 
 
         //Add 5 Pixels rigid space between components
-
-        panel4.add(Box.createRigidArea(new Dimension(20, 20)));
-        panel4.add(textAreasp);
-        panel4.add(Box.createRigidArea(new Dimension(20, 5)));
-        panel4.add(listPane2);
-        panel4.add(Box.createRigidArea(new Dimension(20, 20)));
+        panel2.add(Box.createRigidArea(new Dimension(20, 20)));
+        panel2.add(textAreasp);
+        panel2.add(Box.createRigidArea(new Dimension(20, 5)));
+        panel2.add(resultField);
+        panel2.add(Box.createRigidArea(new Dimension(20, 20)));
 
 
         //add save button and link it with SaveButtonHandler
         JButton save = new JButton("Save");
         save.setSize(200, 50);
         save.addActionListener(new SaveButtonHandler());
-        save.setBackground(pastelYellow);
+        save.setBackground(buttonC);
+        save.setFont(buttonFont);
         frame.getContentPane().add(save);
 
 
         JButton clearButton = new JButton("Clear");
         clearButton.setSize(200, 50);
-        clearButton.setBackground(pastelYellow);
+        clearButton.setBackground(buttonC);
         clearButton.addActionListener(new ClearButtonHandler());
+        clearButton.setFont(buttonFont);
 
 
-        //Panel2-----------------------------------------------------
-        JPanel panel5 = new JPanel();
-        panel5.add(save);
-        panel5.add(Box.createRigidArea(new Dimension(50, 5)));
-        panel5.add(clearButton);
-        panel5.add(Box.createVerticalGlue());
-        panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
-        panel5.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel5.setBackground(new Color(198, 175, 223));
-
+        //Panel3-----------------------------------------------------
+        JPanel panel3 = new JPanel();
+        panel3.add(save);
+        panel3.add(Box.createRigidArea(new Dimension(50, 5)));
+        panel3.add(clearButton);
+        panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
+        panel3.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel3.setBackground(backgroundC);
 
         frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
         frame.getContentPane().add(Box.createRigidArea(new Dimension(5, 20)));
-        frame.getContentPane().add(panel0);
+        frame.getContentPane().add(panel1);
         frame.getContentPane().add(Box.createRigidArea(new Dimension(5, 20)));
-        frame.getContentPane().add(panel4);
+        frame.getContentPane().add(panel2);
         frame.getContentPane().add(Box.createRigidArea(new Dimension(5, 20)));
-        frame.getContentPane().add(panel5);
+        frame.getContentPane().add(panel3);
         frame.getContentPane().add(Box.createRigidArea(new Dimension(5, 20)));
 
         frame.addWindowListener(new MyWindowListener());
-
         frame.setVisible(true);
     }
 
@@ -213,11 +265,17 @@ public class UI {
         public void actionPerformed(ActionEvent e) {
             // shows result
 
-            String urlAddress = aTextField0.getText();
-            String needle = aTextField.getText();
-            Integer surroundingWords = Integer.valueOf(aTextField1.getText());
-            textArea.setText("\t\t ----- Sentence ----- \t\t\n");
-            listPane2.setText("\t \t  ----- Result ----- \t \t\n");
+            String urlAddress = urlField.getText();
+            String needle = wordField.getText();
+            Integer surroundingWords = 0;
+            try {
+                surroundingWords = Integer.valueOf(surroundNfield.getText());
+            } catch (NumberFormatException a){
+           a.printStackTrace();
+               // JOptionPane.showMessageDialog(frame, "Please enter a integer");
+            }
+            sentenceField.setText("\t\t ----- Sentence ----- \t\t\n");
+            resultField.setText("\t \t  ----- Result ----- \t \t\n");
 
             SearchType type = null;
             //"Exact form", "Lemma", "Entering tag"};
@@ -234,15 +292,39 @@ public class UI {
             }
 
             //String text = getTxtFromURL(urlAddress);
-            String text = "“We’re spending the night here. I’ve already let my parents know not to expect us back. You don’t have to worry about Chris.”\n" +
-                    "\n" +
-                    "Oh! The arrogance of his assumption doesn’t annoy me – instead it serves as proof of his thoughtfulness though, I worry about leaving with one man and coming home with another. I push the thought away, eager to indulge in a bit of Mr Grey.\n" +
-                    "\n" +
-                    "“Thank you.” I fling my arms around his neck, beyond ecstatic and smile at him, cramming every bit of joy I feel into it. This suite that I could hardly bear to enter into an hour ago has now become the perfect place for our reunion.";
-            List<POSResult> results = searchText(text, type, needle, surroundingWords);
+            String text = "He crawls up, between my legs where he stops to rid me of my sodden panties. " +
+                    "He slings it away carelessly, his ogling eyes never leaving the naked place they covered. " +
+                    "He continues to stare, licking his lips – obviously beyond aroused by the sight but there’s nothing " +
+                    "to hide my intimate folds and I feel exposed, squirming and certain that my blush reaches all the way down there.";
+            List<POSResult> results =null;
+            try {
+                results = searchText(text, type, needle, surroundingWords);
+            } catch (NullPointerException n){
+                n.printStackTrace();
+               // JOptionPane.showMessageDialog(frame, "Please enter an input");
+            }
 
             // Highlighter highlighter = comp.getHighlighter();
             // Highlighter.Highlight[] highlights = highlighter.getHighlights();
+
+            if (text.isEmpty()|| urlAddress.contains(" ") || !urlAddress.contains(".")) {
+                JOptionPane.showMessageDialog(frame, "Please enter a valid URL address");
+                return;
+            }
+            if (needle.isEmpty()|| needle.contains(" ")) {
+                JOptionPane.showMessageDialog(frame, "Please enter a word");
+                return;
+            }
+
+            if (surroundingWords <1) {
+                JOptionPane.showMessageDialog(frame, "Please enter the number of surrounding words");
+                return;
+            }
+
+            if(type == null){
+                JOptionPane.showMessageDialog(frame, "Please select a type");
+                return;
+            }
 
 
             if (results.size() == 0) {
@@ -250,8 +332,8 @@ public class UI {
             }
 
             if (results.isEmpty()) {
-                textArea.append("  (0 result)\n");
-                listPane2.append("  (0 result)\n");
+                sentenceField.append("  (0 result)\n");
+                resultField.append("  (0 result)\n");
             } else {
                 for (POSResult a : results) {
                     String sentence = "";
@@ -259,12 +341,13 @@ public class UI {
                         sentence += token + " ";
 
                     }
-                    textArea.append("  " + sentence + "\n");
+                    sentenceField.append("  " + sentence + "\n");
                     try {
                         List<Integer> indexes = new ArrayList<>();
                         int index = 0;
                         while (index != -1) {
-                            index = textArea.getText().indexOf(needle, index);
+                            String textUppercase = sentenceField.getText().toLowerCase(Locale.ROOT);
+                            index = textUppercase.indexOf(" " + needle.toLowerCase(Locale.ROOT) + " ", index);
                             if (index != -1) {
                                 indexes.add(index);
                                 index++;
@@ -272,15 +355,13 @@ public class UI {
                         }
 
                         for (int i : indexes) {
-                            textArea.getHighlighter().addHighlight(i, i + needle.length(), new DefaultHighlighter.DefaultHighlightPainter(Color.yellow));
+                            sentenceField.getHighlighter().addHighlight(i + 1, i + needle.length() + 1, new DefaultHighlighter.DefaultHighlightPainter(Color.yellow));
                         }
 
-                        System.out.println(textArea.getText().indexOf(needle));
-                        System.out.println(textArea.getText().indexOf(needle) + 3);
                     } catch (BadLocationException badLocationException) {
                         badLocationException.printStackTrace();
                     }
-                    listPane2.append("  " + "Word: " + a.getWord() + ", Lemma: " + a.getLemma() + ", POSTag: " + a.getPos() + "\n");
+                    resultField.append("  " + "Word: " + a.getWord() + ", Lemma: " + a.getLemma() + ", POSTag: " + a.getPos() + "\n");
 
                 }
 
@@ -293,14 +374,14 @@ public class UI {
     private class SaveButtonHandler implements ActionListener {
         public void actionPerformed(ActionEvent e) {
 
-            String urlAddress = aTextField0.getText();
-            String needle = aTextField.getText();
-            Integer surroundingWords = Integer.valueOf(aTextField1.getText());
+            String urlAddress = urlField.getText();
+            String needle = wordField.getText();
+            Integer surroundingWords = Integer.valueOf(surroundNfield.getText());
 
             SearchType type = null;
             //"Exact form", "Lemma", "Entering tag"};
             switch (makeChoice.getSelectedItem().toString()) {
-                case "Extact form":
+                case "Exact form":
                     type = ExactForm;
                     break;
                 case "Lemma":
@@ -311,15 +392,6 @@ public class UI {
                     break;
             }
 
-/**
- if(makeChoice.getSelectedItem().equals("Extact form")) {
- type = ExactForm;
- } else if (makeChoice.getSelectedItem().equals("Lemma")) {
- type = Lemma;
- } else if (makeChoice.getSelectedItem().equals("Entering tag")) {
- type = EnteringTag;
- }
- */
             String text = getTxtFromURL(urlAddress);
             List<POSResult> results = searchText(text, type, needle, surroundingWords);
 
@@ -335,16 +407,16 @@ public class UI {
 
     private class ClearButtonHandler implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            aTextField.setText("Enter a word");
-            aTextField1.setText("Enter the number of surrounding words");
-            aTextField0.setText("Enter the URL");
-            textArea.setText("\t\t ----- Sentence ----- \t\t\n");
-            listPane2.setText("\t \t  ----- Result ----- \t \t\n");
+            wordField.setText("Enter a word");
+            surroundNfield.setText("Enter the number of surrounding words");
+            urlField.setText("Enter the URL");
+            sentenceField.setText("\t\t ----- Sentence ----- \t\t\n");
+            resultField.setText("\t \t  ----- Result ----- \t \t\n");
             makeChoice.setSelectedIndex(0);
         }
     }
 
-    private class ValueReporter implements ListSelectionListener {
+    private class ValueReporter implements ListSelectionListener {  ///????이거뭐임
 
         public void valueChanged(ListSelectionEvent event) {
         }
