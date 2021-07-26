@@ -44,11 +44,12 @@ public class UI {
      */
     UI() {
 
+
         // Color
-        Color inputC = new Color(237, 232, 234); //lightGray
-        Color outputC = new Color(239, 239, 239); //brightGray
-        Color buttonC = new Color(243, 240, 224); //alabaster
-        Color backgroundC = new Color(228, 234, 222); //chineseWhite
+        Color inputC = new Color(223, 187, 187); //pale Chestnut
+        Color outputC = new Color(249, 241, 214); //antique White
+        Color buttonC = new Color(247, 202, 143); //peach Orange
+        Color backgroundC = new Color(255, 223, 201); //unbleached Silk
 
         //Font
         Font fieldFont = new Font("Courier", Font.PLAIN, 15);
@@ -59,26 +60,38 @@ public class UI {
         frame.setSize(1400, 800);
         frame.getContentPane().setBackground(backgroundC);
 
-
-        //Override JFrames default layout manager.
-        //Text field to edit selection
-
-        /* Create a fixed size for the text field. Otherwise the text field
-         * will stretch when the window is resized
-         */
-        // aTextField.setMaximumSize(new Dimension(200, 40));
-
-        // Data to display in the list
-
         //Connect List and SelectionListener
         Dimension size = new Dimension(150, 30);
+
+        //Create Buttons
+        //Button: "Search"
+        JButton searchButton = new JButton("Search");
+        searchButton.setMaximumSize(size);
+        searchButton.setBackground(buttonC);
+        searchButton.addActionListener(new SearchButtonHandler());
+        searchButton.setFont(buttonFont);
+
+        //Button: "Save" with SaveButtonHandler
+        JButton save = new JButton("Save");
+        save.setSize(200, 50);
+        save.addActionListener(new SaveButtonHandler());
+        save.setBackground(buttonC);
+        save.setFont(buttonFont);
+        frame.getContentPane().add(save);
+
+        //Button: "Clear"
+        JButton clearButton = new JButton("Clear");
+        clearButton.setSize(200, 50);
+        clearButton.setBackground(buttonC);
+        clearButton.addActionListener(new ClearButtonHandler());
+        clearButton.setFont(buttonFont);
 
         //Panel1-----------------------------------------------------
 
         JPanel panel1 = new JPanel();
-
         panel1.setBackground(buttonC);
 
+        //Box: "enter URL"
         urlText = new JTextArea("URL : ");
         urlText.setMaximumSize(new Dimension(200, 30));
         urlText.setBackground(backgroundC);
@@ -97,6 +110,7 @@ public class UI {
             }
         });
 
+        //Box: "enter Word"
         wordText = new JTextArea("Word : ");
         wordText.setMaximumSize(new Dimension(100, 30));
         wordText.setBackground(backgroundC);
@@ -115,6 +129,7 @@ public class UI {
             }
         });
 
+        //Box: "Surrounding words"
         surroundingNText = new JTextArea("Surrounding words : ");
         surroundingNText.setMaximumSize(new Dimension(100, 30));
         surroundingNText.setBackground(backgroundC);
@@ -133,17 +148,11 @@ public class UI {
             }
         });
 
-        JButton searchButton = new JButton("Search");
-        searchButton.setMaximumSize(size);
-        searchButton.setBackground(buttonC);
-        searchButton.addActionListener(new SearchButtonHandler());
-        searchButton.setFont(buttonFont);
-
+        //Box: "make Choice"
         makeChoice = new JComboBox(s1);
         makeChoice.setMaximumSize(new Dimension(200, 30));
         makeChoice.setFont(fieldFont);
         makeChoice.setBackground(inputC);
-
 
         //Override JFrames default layout manager.
         BoxLayout aBoxLayout1 = new BoxLayout(panel1, BoxLayout.X_AXIS);
@@ -168,12 +177,14 @@ public class UI {
 
         //Panel2-----------------------------------------------------
 
+        //output Textbox: "Sentence"
         sentenceField.setText("\t\t ----- Sentence ----- \t\t\n");
         sentenceField.setBackground(outputC);
         sentenceField.setEditable(false);
         sentenceField.setFont(contentFont);
         sentenceField.setMaximumSize(new Dimension(500, 300));
 
+        //output Textbox: "Result"
         JScrollPane textAreasp = new JScrollPane(sentenceField);
         textAreasp.setSize(new Dimension(500, 300));
         resultField = new JTextArea("\t \t  ----- Result ----- \t \t\n");
@@ -182,12 +193,10 @@ public class UI {
         resultField.setFont(contentFont);
 
         JPanel panel2 = new JPanel();
-
         //Override JFrames default layout manager.
         BoxLayout aBoxLayout = new BoxLayout(panel2, BoxLayout.X_AXIS);
         panel2.setLayout(aBoxLayout);
         panel2.setBackground(backgroundC);
-
 
         //Add 5 Pixels rigid space between components
         panel2.add(Box.createRigidArea(new Dimension(20, 20)));
@@ -197,23 +206,8 @@ public class UI {
         panel2.add(Box.createRigidArea(new Dimension(20, 20)));
 
 
-        //add save button and link it with SaveButtonHandler
-        JButton save = new JButton("Save");
-        save.setSize(200, 50);
-        save.addActionListener(new SaveButtonHandler());
-        save.setBackground(buttonC);
-        save.setFont(buttonFont);
-        frame.getContentPane().add(save);
-
-
-        JButton clearButton = new JButton("Clear");
-        clearButton.setSize(200, 50);
-        clearButton.setBackground(buttonC);
-        clearButton.addActionListener(new ClearButtonHandler());
-        clearButton.setFont(buttonFont);
-
-
         //Panel3-----------------------------------------------------
+
         JPanel panel3 = new JPanel();
         panel3.add(save);
         panel3.add(Box.createRigidArea(new Dimension(50, 5)));
@@ -233,6 +227,7 @@ public class UI {
 
         frame.addWindowListener(new MyWindowListener());
         frame.setVisible(true);
+
     }
 
     /**
@@ -253,6 +248,7 @@ public class UI {
     public void save(String url, String needle, SearchType type, List<POSResult> results) {
         Saver.save(url, needle, type, results);
     }
+    
 
 
     /*
@@ -294,18 +290,24 @@ public class UI {
             //String text = getTxtFromURL(urlAddress);
             String text = "He crawls up, between my legs where he stops to rid me of my sodden panties. " +
                     "He slings it away carelessly, his ogling eyes never leaving the naked place they covered. " +
-                    "He continues to stare, licking his lips – obviously beyond aroused by the sight but there’s nothing " +
-                    "to hide my intimate folds and I feel exposed, squirming and certain that my blush reaches all the way down there.";
+                    "He continues to stare, licking his lips – obviously beyond aroused by the sight but there’s nothing to hide my intimate folds and I feel exposed, squirming and certain that my blush reaches all the way down there.\n" +
+                    "\n" +
+                    "He takes his sweet, torturous time – luxuriating in his private viewing activity. " +
+                    "He makes no move to touch me but the ravenous mould of his face is pushing me to run up the steps of desire, taking them three at a time. I shift in needy response.\n" +
+                    "\n" +
+                    "He growls, low in his chest while he grips my inner thighs, pushing them apart. " +
+                    "“Keep still or I’ll make you.” I gasp at his provocative threat and on pure instinct and raw desire my hips tilt up by their own accord, crazy in its need for any contact. " +
+                    "His hands slip around, cupping my backside as he pushes his nose into my sex, inhaling deeply.\n" +
+                    "\n" +
+                    "Oh my fucking my!";
             List<POSResult> results =null;
             try {
                 results = searchText(text, type, needle, surroundingWords);
             } catch (NullPointerException n){
                 n.printStackTrace();
-               // JOptionPane.showMessageDialog(frame, "Please enter an input");
+                return;
             }
 
-            // Highlighter highlighter = comp.getHighlighter();
-            // Highlighter.Highlight[] highlights = highlighter.getHighlights();
 
             if (text.isEmpty()|| urlAddress.contains(" ") || !urlAddress.contains(".")) {
                 JOptionPane.showMessageDialog(frame, "Please enter a valid URL address");
@@ -346,8 +348,10 @@ public class UI {
                         List<Integer> indexes = new ArrayList<>();
                         int index = 0;
                         while (index != -1) {
-                            String textUppercase = sentenceField.getText().toLowerCase(Locale.ROOT);
-                            index = textUppercase.indexOf(" " + needle.toLowerCase(Locale.ROOT) + " ", index);
+                            //String textUppercase = sentenceField.getText().toLowerCase(Locale.ROOT);
+                           // index = textUppercase.indexOf(" " + needle.toLowerCase(Locale.ROOT) + " ", index);
+                            String textUppercase = sentenceField.getText();
+                            index = textUppercase.indexOf(" " + a.getWord() + " ", index);
                             if (index != -1) {
                                 indexes.add(index);
                                 index++;
@@ -355,7 +359,7 @@ public class UI {
                         }
 
                         for (int i : indexes) {
-                            sentenceField.getHighlighter().addHighlight(i + 1, i + needle.length() + 1, new DefaultHighlighter.DefaultHighlightPainter(Color.yellow));
+                            sentenceField.getHighlighter().addHighlight(i + 1, i + a.getWord().length() + 1, new DefaultHighlighter.DefaultHighlightPainter(Color.yellow));
                         }
 
                     } catch (BadLocationException badLocationException) {
@@ -369,7 +373,6 @@ public class UI {
             }
         }
     }
-
 
     private class SaveButtonHandler implements ActionListener {
         public void actionPerformed(ActionEvent e) {
