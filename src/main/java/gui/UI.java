@@ -14,9 +14,14 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static kwic.SearchType.*;
 import static kwic.Searcher.search;
@@ -241,7 +246,7 @@ public class UI {
         return search(text, type, needle, surroundingWords, surroundingWords);
     }
 
-    private String getTxtFromURL(String url) {
+    private String getTxtFromURL(String url) throws IOException {
         return scrape(url);
     }
 
@@ -268,8 +273,8 @@ public class UI {
             try {
                 surroundingWords = Integer.valueOf(surroundNfield.getText());
             } catch (NumberFormatException a){
-           a.printStackTrace();
-               // JOptionPane.showMessageDialog(frame, "Please enter a integer");
+                a.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Please enter a positive integer for surrounding words");
             }
             sentenceField.setText("\t\t ----- Sentence ----- \t\t\n");
             resultField.setText("\t \t  ----- Result ----- \t \t\n");
@@ -288,29 +293,26 @@ public class UI {
                     break;
             }
 
-            //String text = getTxtFromURL(urlAddress);
-            String text = "He crawls up, between my legs where he stops to rid me of my sodden panties. " +
-                    "He slings it away carelessly, his ogling eyes never leaving the naked place they covered. " +
-                    "He continues to stare, licking his lips – obviously beyond aroused by the sight but there’s nothing to hide my intimate folds and I feel exposed, squirming and certain that my blush reaches all the way down there.\n" +
-                    "\n" +
-                    "He takes his sweet, torturous time – luxuriating in his private viewing activity. " +
-                    "He makes no move to touch me but the ravenous mould of his face is pushing me to run up the steps of desire, taking them three at a time. I shift in needy response.\n" +
-                    "\n" +
-                    "He growls, low in his chest while he grips my inner thighs, pushing them apart. " +
-                    "“Keep still or I’ll make you.” I gasp at his provocative threat and on pure instinct and raw desire my hips tilt up by their own accord, crazy in its need for any contact. " +
-                    "His hands slip around, cupping my backside as he pushes his nose into my sex, inhaling deeply.\n" +
-                    "\n" +
-                    "Oh my fucking my!";
+//            String text = "He crawls up, between my legs where he stops to rid me of my sodden panties. " +
+//                    "He slings it away carelessly, his ogling eyes never leaving the naked place they covered. " +
+//                    "He continues to stare, licking his lips – obviously beyond aroused by the sight but there’s nothing to hide my intimate folds and I feel exposed, squirming and certain that my blush reaches all the way down there.\n" +
+//                    "\n" +
+//                    "He takes his sweet, torturous time – luxuriating in his private viewing activity. " +
+//                    "He makes no move to touch me but the ravenous mould of his face is pushing me to run up the steps of desire, taking them three at a time. I shift in needy response.\n" +
+//                    "\n" +
+//                    "He growls, low in his chest while he grips my inner thighs, pushing them apart. " +
+//                    "“Keep still or I’ll make you.” I gasp at his provocative threat and on pure instinct and raw desire my hips tilt up by their own accord, crazy in its need for any contact. " +
+//                    "His hands slip around, cupping my backside as he pushes his nose into my sex, inhaling deeply.\n" +
+//                    "\n" +
+//                    "Oh my fucking my!";
             List<POSResult> results =null;
+            String text = null;
+
+
             try {
-                results = searchText(text, type, needle, surroundingWords);
-            } catch (NullPointerException n){
-                n.printStackTrace();
-                return;
-            }
-
-
-            if (text.isEmpty()|| urlAddress.contains(" ") || !urlAddress.contains(".")) {
+                URL validatedUrl = new URL(urlAddress);
+            } catch (MalformedURLException malformedURLException) {
+                malformedURLException.printStackTrace();
                 JOptionPane.showMessageDialog(frame, "Please enter a valid URL address");
                 return;
             }
@@ -320,7 +322,7 @@ public class UI {
             }
 
             if (surroundingWords <1) {
-                JOptionPane.showMessageDialog(frame, "Please enter the number of surrounding words");
+                JOptionPane.showMessageDialog(frame, "Please enter the number of surrounding words (that is larger than 0)");
                 return;
             }
 
@@ -328,6 +330,14 @@ public class UI {
                 JOptionPane.showMessageDialog(frame, "Please select a type");
                 return;
             }
+
+            try {
+                text = getTxtFromURL(urlAddress);
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+
+            results = searchText(text, type, needle, surroundingWords);
 
 
             if (results.size() == 0) {
@@ -396,7 +406,14 @@ public class UI {
                     break;
             }
 
-            String text = getTxtFromURL(urlAddress);
+            String text = null;
+
+            try {
+                text = getTxtFromURL(urlAddress);
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+
             List<POSResult> results = searchText(text, type, needle, surroundingWords);
 
             try {

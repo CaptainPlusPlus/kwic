@@ -1,20 +1,19 @@
 package scraper;
 
-import org.openqa.selenium.remote.CapabilityType;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
-import java.net.URL;
+import java.io.IOException;
 
 public class URLScraper {
-    //SELENIUM???
-    static public String scrape(String url) {
-        //Convert text to URL, spit error or smth if it is not
-
-
-        //Use URL to navigate to page
-
+    static public String scrape(String url) throws IOException {
+        String pageHTML = Jsoup.connect(url).ignoreContentType(true).userAgent("Mozilla").get().html();
 
         //Extract text from page
+        Document document = Jsoup.parse(pageHTML);
+        Element body = document.body();
 
-        return ""; //TODO scrape from web and return text
+        return body.text();
     }
 }
