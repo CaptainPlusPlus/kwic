@@ -246,7 +246,8 @@ public class UI {
     }
 
     public void save(String url, String needle, SearchType type, List<POSResult> results) {
-        Saver.save(url, needle, type, results);
+        Saver saver = new Saver(url, needle, type, results);
+        saver.save();
     }
     
 

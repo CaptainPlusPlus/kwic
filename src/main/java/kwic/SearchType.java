@@ -1,5 +1,20 @@
 package kwic;
 
 public enum SearchType {
-    ExactForm, Lemma, EnteringTag
+    ExactForm {
+        @Override
+        public String toString() {
+            return "word";
+        }
+    }, Lemma {
+        @Override
+        public String toString() {
+            return "lemma";
+        }
+    }, EnteringTag {
+        @Override
+        public String toString() {
+            return "pos";
+        }
+    }
 }

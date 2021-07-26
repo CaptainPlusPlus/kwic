@@ -9,7 +9,7 @@ public class POSResult {
     final String lemma;
     final String pos;
 
-    POSResult(List<String> sentence, int wordIndex, String lemma, String pos, String word) {
+    public POSResult(List<String> sentence, int wordIndex, String lemma, String pos, String word) {
         this.sentence = sentence;
         this.wordIndex = wordIndex;
         this.lemma = lemma;
