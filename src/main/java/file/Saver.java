@@ -1,6 +1,16 @@
+/**
+ * Course:      Data Structures and Algorithms for Computational Linguistics II SS2021
+ * Assignment:  (Final KWIC Project)
+ * Authors:      (Hoyeon Lee, Nkonye Gbadegoye, Dewi Surya, Jacqueline Becker, Felix Redfox)
+ * Description: (Project to extract text from url and find/save needle typed results on it with their POS information)
+ *
+ * Honor Code:  We pledge that this program represents our own work.
+ *  we did not receive help from anyone in designing and debugging this program.
+ */
+
 package file;
 
-import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;
+import com.sun.xml.txw2.output.IndentingXMLStreamWriter;
 import kwic.POSResult;
 import kwic.SearchType;
 
@@ -12,12 +22,23 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.util.List;
 
+
+/**
+ * Saves text in POS results format into local XML file in given format
+ */
 public class Saver {
     private String url;
     private String needle;
     private SearchType type;
     private List<POSResult> results;
 
+    /**
+     * Initialize saver operation with required data for XML
+     * @param url site were body is obtained
+     * @param needle searched needle on text
+     * @param type type of search executed on text
+     * @param results results obtained from search
+     */
     public Saver(String url, String needle, SearchType type, List<POSResult> results) {
         this.url = url;
         this.type = type;
@@ -25,9 +46,14 @@ public class Saver {
         this.results = results;
     }
 
+    /**
+     * Saves results into XML file format
+     */
     public void save() {
+        // Create writer for XML
         try {
             FileWriter fw = new FileWriter(new File(needle + "Results" + type.toString().toUpperCase() + "Output.xml"));
+            //Generate xml with writer
             generateXML(fw);
             fw.close();
         } catch (Exception ex) {
@@ -35,7 +61,12 @@ public class Saver {
         }
     }
 
+    /**
+     * Generates xml tree on results
+     * @param w xml writer
+     */
     private void generateXML(Writer w) {
+        //Init output factory
         XMLOutputFactory output = XMLOutputFactory.newInstance();
         XMLStreamWriter writer = null;
         try {
@@ -44,6 +75,7 @@ public class Saver {
         } catch (XMLStreamException e) {
             e.printStackTrace();
         }
+        //Build the actual tree according to format
         buildXMLTree(writer);
     }
 

@@ -1,3 +1,13 @@
+/**
+ * Course:      Data Structures and Algorithms for Computational Linguistics II SS2021
+ * Assignment:  (Final KWIC Project)
+ * Authors:      (Hoyeon Lee, Nkonye Gbadegoye, Dewi Surya, Jacqueline Becker, Felix Redfox)
+ * Description: (Project to extract text from url and find/save needle typed results on it with their POS information)
+ *
+ * Honor Code:  We pledge that this program represents our own work.
+ *  we did not receive help from anyone in designing and debugging this program.
+ */
+
 package gui;
 
 
@@ -19,9 +29,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static kwic.SearchType.*;
 import static kwic.Searcher.search;
